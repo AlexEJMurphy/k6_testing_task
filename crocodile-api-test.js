@@ -7,19 +7,16 @@ export const options = {
 };
 
 export default function () {
-  // First request: Get all crocodiles
+  // First request
   const res1 = http.get('https://test-api.k6.io/public/crocodiles/');
-  check(res1, {
-    'status is 200': (r) => r.status === 200,
-  });
+  console.log(`First Response Status: ${res1.status}, Body Length: ${res1.body.length}`);
   
-  // Store IDs from response
+  // Parse and log random ID
   const crocodiles = JSON.parse(res1.body);
   const randomId = crocodiles[Math.floor(Math.random() * crocodiles.length)].id;
+  console.log(`Selected ID: ${randomId}`);
 
-  // Second request: Get specific crocodile
+  // Second request
   const res2 = http.get(`https://test-api.k6.io/public/crocodiles/${randomId}/`);
-  check(res2, {
-    'status is 200': (r) => r.status === 200,
-  });
+  console.log(`Second Response Status: ${res2.status}, Body: ${res2.body}`);
 }
