@@ -1,5 +1,9 @@
 import { check } from 'k6';
 import http from 'k6/http';
+import { Trend } from 'k6/metrics';
+
+const firstRequestTime = new Trend('first_request_time');
+const secondRequestTime = new Trend('second_request_time');
 
 export const options = {
   vus: 1,
@@ -12,7 +16,8 @@ export default function () {
   check(res1, {
     'status is 200': (r) => r.status === 200,
     })
-  console.log(`First Response Status: ${res1.status}, Body Length: ${res1.body.length}`);
+  //console.log(`First Response Status: ${res1.status}, Body Length: ${res1.body.length}`);
+  firstRequestTime.add(res1.timings.duration);
   
   // Parse and log random ID
   const crocodiles = JSON.parse(res1.body);
@@ -24,5 +29,6 @@ export default function () {
   check(res2, {
     'status is 200': (r) => r.status === 200,
     });
-  console.log(`Second Response Status: ${res2.status}, Body: ${res2.body}`);
+  //console.log(`Second Response Status: ${res2.status}, Body: ${res2.body}`);
+  secondRequestTime.add(res2.timings.duration);
 }
