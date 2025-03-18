@@ -34,8 +34,13 @@ export default function () {
   secondRequestTime.add(res2.timings.duration);
 }
 
+//Create summary.html report where title reflects duration and no. of vu's
 export function handleSummary(data) {
+  const vus = __ENV.VUS || 'unknown';
+  const duration = __ENV.DURATION || 'unknown';
+  const reportName = `summary_${vus}vu_${duration}s.html`;
+  
   return {
-    "summary.html": htmlReport(data),
+    [reportName]: htmlReport(data),
   };
 }
