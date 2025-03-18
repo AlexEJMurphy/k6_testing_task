@@ -6,10 +6,21 @@ import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporte
 const firstRequestTime = new Trend('first_request_time');
 const secondRequestTime = new Trend('second_request_time');
 
+// Gradual ramp-up pattern
 export const options = {
-  vus: 1,
-  duration: '10s',
-};
+    scenarios: {
+      gradual_load: {
+        executor: 'ramping-vus',
+        startVUs: 0,
+        stages: [
+          { duration: '2m', target: 20 },  // Ramp-up to 20 VUs
+          { duration: '5m', target: 20 },  // Sustain
+          { duration: '1m', target: 0 }    // Cool-down
+        ],
+        gracefulRampDown: '30s'
+      }
+    }
+  };
 
 export default function () {
   // First request
@@ -34,8 +45,13 @@ export default function () {
   secondRequestTime.add(res2.timings.duration);
 }
 
-export function handleSummary(data) {
-  return {
-    "summary.html": htmlReport(data),
-  };
-}
+//Create summary.html report where title reflects duration and no. of vu's
+// export function handleSummary(data) {
+//   const vus = __ENV.VUS || 'unknown';
+//   const duration = __ENV.DURATION || 'unknown';
+//   const reportName = `summary_${vus}vu_${duration}s.html`;
+  
+//   return {
+//     [reportName]: htmlReport(data),
+//   };
+// }
